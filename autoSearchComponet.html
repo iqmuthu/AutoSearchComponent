@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Auto Search Component</title>
+  </head>
+  <body>
+    <div id="AutoSearchComponent-div"></div>
+
+    <script src="https://fb.me/react-15.0.0.js"></script>
+    <script src="https://fb.me/react-dom-15.0.0.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-core/5.8.34/browser.min.js"></script>
+    <script type="text/babel">
+      var AutoSearchComponent = React.createClass({
+        getInitialState: function() {
+            return { searchValue: '' };
+        },
+        onSearchList: function(event){
+            const{ value } = event.target;
+            this.setState({searchValue:value});
+        },
+        onChangeSearchList : function(event){
+            const{ value } = event.target;
+            this.setState({searchValue:value});
+        },
+        onFocusSearchList : function(event){
+            const{ value } = event.target;
+            this.setState({searchValue:value});
+        },
+        onBlurSearchList: function(event){
+            const{ value } = event.target;
+            this.setState({searchValue:value});
+        },
+        searchStr : function(itemMergeVars, itemValue){
+            let string =itemValue;
+            for( let i=0;i<itemMergeVars.length;i++){
+                let mergeVar = itemMergeVars[i];
+                for(var key in mergeVar) {
+                    string = string.replace(`%{${mergeVar['key']}}`, mergeVar['value']);
+                }
+            }
+            return string;
+        },
+        render: function() {
+            const { searchArr } = this.props;
+            const { searchValue } = this.state;
+            let searchString = searchValue && searchValue.toLocaleLowerCase();
+          return (
+              <div>
+                <h1>Auto Search Component</h1>
+                <div>
+                     Search item : <input type='search'  onKeyUp={(e)=>this.onSearchList(e)} onChange={(e)=>this.onChangeSearchList(e)} onBlur={(e)=>this.onBlurSearchList(e)} onFocus={(e)=>this.onFocusSearchList(e)}/>
+                </div>
+                <div>
+                    {
+                        searchArr.map((item,index) =>{
+                            let searchName = item.name.toLocaleLowerCase();
+                            let searchValue = item.value.toLocaleLowerCase();
+                            let itemValue = item.value;
+                            let itemMergeVars = item.merge_vars || null;
+                           let itemSearchValue = itemMergeVars ? this.searchStr(itemMergeVars, itemValue) : itemValue;
+                            return(
+                                searchString && (searchName.indexOf(searchString)>=0 || searchValue.indexOf(searchString)>=0) && <div key={index}>
+                                  {
+                                    <p>{itemSearchValue}</p>
+                                  }
+                                </div>
+                            );
+                        })
+                    }
+                </div>
+            </div>
+          )
+        }
+      });
+       let textArr = [
+                {
+                    "name": "checkout.customer.header",
+                    "value": "Add your account details"
+                },
+                {
+                    "name": "checkout.review.btn.txt",
+                    "value": "Pay %{amount} and subscribe",
+                    "merge_vars": [
+                    {
+                        "key": "amount",
+                        "value": "$100"
+                    }
+                    ]
+                },
+                {
+                    "name": "checkout.customer.header.edit",
+                    "value": "Editing account details"
+                },
+                {
+                    "name": "subscription.next.renewing_estimate.eot",
+                    "value": "You will be charged %{amount} every %{billing_period} via",
+                    "merge_vars": [
+                    {
+                        "key": "amount",
+                        "value": "$100"
+                    },
+                    {
+                        "key": "billing_period",
+                        "value": "1 month"
+                    }
+                    ]
+                }
+            ];
+
+      ReactDOM.render(
+        <AutoSearchComponent searchArr={textArr}/>,
+        document.getElementById('AutoSearchComponent-div')
+      );
+    </script>
+  </body>
+</html>
